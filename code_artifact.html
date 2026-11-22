@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ห้องนั่งเล่นคริสต์มาสแสนอบอุ่น - ตกแต่งเตาผิงและต้นคริสต์มาส</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Mali (น่ารัก สไตล์ลายมือ) และ Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mali:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-wall-day: #fdf6ec;
+            --bg-wall-pattern: #f5ebe0;
+            --bg-floor: #d5bdaf;
+            --bg-night-overlay: rgba(15, 23, 42, 0.82);
+            --accent-red: #e07a5f;
+            --accent-green: #81b29a;
+            --accent-gold: #f2cc8f;
+            --text-brown: #4a3f35;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            font-family: 'Mali', 'Prompt', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f3e9dc;
+            color: var(--text-brown);
+            overflow-x: hidden;
+            touch-action: pan-y;
+        }
+
+        /* พื้นหลังลายวอลเปเปอร์พาสเทลอบอุ่น */
+        .room-wallpaper {
+            background-color: var(--bg-wall-day);
+            background-image: 
+                radial-gradient(#e6ccb2 1.5px, transparent 1.5px),
+                radial-gradient(#e6ccb2 1.5px, var(--bg-wall-day) 1.5px);
+            background-size: 36px 36px;
+            background-position: 0 0, 18px 18px;
+            transition: filter 1.5s ease, background-color 1.5s ease;
+        }
+
+        /* พื้นไม้ห้องนั่งเล่น */
+        .wood-floor {
+            background: repeating-linear-gradient(
+                90deg,
+                #d5bdaf 0px,
+                #d5bdaf 78px,
+                #c3a99a 78px,
+                #c3a99a 80px
+            );
+            border-top: 8px solid #b08968;
+        }
+
+        /* กรอบสไตล์ Scrapbook / Hand-drawn */
+        .scrapbook-card {
+            background: #fffcf7;
+            border: 2.5px solid #5c4d3c;
+            border-radius: 20px;
+            box-shadow: 4px 4px 0px #5c4d3c;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .scrapbook-btn {
+            border: 2px solid #5c4d3c;
+            border-radius: 16px;
+            box-shadow: 3px 3px 0px #5c4d3c;
+            transition: all 0.12s ease;
+            cursor: pointer;
+        }
+
+        .scrapbook-btn:hover:not(:disabled) {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0px #5c4d3c;
+        }
+
+        .scrapbook-btn:active:not(:disabled) {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px #5c4d3c;
+        }
+
+        /* เปลวไฟในเตาผิง */
+        @keyframes flicker {
+            0%, 100% { transform: scale(1) rotate(-1deg); opacity: 0.95; }
+            25% { transform: scale(1.06, 0.95) rotate(1.5deg); opacity: 1; }
+            50% { transform: scale(0.96, 1.05) rotate(-1.5deg); opacity: 0.9; }
+            75% { transform: scale(1.03, 0.98) rotate(1deg); opacity: 1; }
+        }
+
+        .fire-flame {
+            transform-origin: bottom center;
+            animation: flicker 1.4s infinite ease-in-out;
+        }
+
+        .fire-flame-inner {
+            transform-origin: bottom center;
+            animation: flicker 1.1s infinite ease-in-out reverse;
+        }
+
+        /* แสงไฟกระพริบ */
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 6px currentColor); }
+            50% { opacity: 0.35; transform: scale(0.85); filter: drop-shadow(0 0 1px currentColor); }
+        }
+
+        .twinkle-1 { animation: twinkle 1.6s infinite ease-in-out; }
+        .twinkle-2 { animation: twinkle 2.1s infinite ease-in-out 0.5s; }
+        .twinkle-3 { animation: twinkle 1.8s infinite ease-in-out 1s; }
+
+        /* หิมะตกนอกหน้าต่าง */
+        @keyframes snowFall {
+            0% { transform: translateY(-10px) translateX(0px); opacity: 0; }
+            15% { opacity: 0.9; }
+            85% { opacity: 0.9; }
+            100% { transform: translateY(190px) translateX(15px); opacity: 0; }
+        }
+
+        .snowflake {
+            animation: snowFall linear infinite;
+        }
+
+        /* ของตกแต่งที่วางบนฉาก */
+        .placed-item {
+            position: absolute;
+            cursor: grab;
+            transform: translate(-50%, -50%);
+            transition: filter 0.15s ease;
+            z-index: 20;
+            touch-action: none;
+            user-select: none;
+        }
+
+        .placed-item:active,
+        .placed-item.dragging {
+            cursor: grabbing;
+            z-index: 45;
+            filter: drop-shadow(0 8px 12px rgba(92, 77, 60, 0.35));
+        }
+
+        .placed-item.selected {
+            filter: drop-shadow(0 0 6px #f2cc8f) drop-shadow(0 0 2px #e07a5f);
+            z-index: 35;
+        }
+
+        .placed-item.selected::after {
+            content: '';
+            position: absolute;
+            inset: -7px;
+            border: 2.5px dashed #e07a5f;
+            border-radius: 16px;
+            pointer-events: none;
+            background: rgba(255, 252, 247, 0.18);
+        }
+
+        /* แถบรายการของตกแต่งป้องกันการเลื่อนหน้าจอขัดจังหวะตอนเริ่มลาก */
+        .tray-item-card {
+            touch-action: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        /* ไฮไลต์โซนเป้าหมายขณะกำลังลากของตกแต่ง */
+        .drop-target-active {
+            box-shadow: inset 0 0 0 4px #f2cc8f, 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* กล่องของขวัญใต้ต้นไม้ */
+        @keyframes giftBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-6px) scale(1.03); }
+        }
+
+        @keyframes giftShake {
+            0%, 100% { transform: rotate(0deg) scale(1.1); }
+            20% { transform: rotate(-10deg) scale(1.15); }
+            40% { transform: rotate(10deg) scale(1.15); }
+            60% { transform: rotate(-8deg) scale(1.2); }
+            80% { transform: rotate(8deg) scale(1.2); }
+        }
+
+        .gift-box-item {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            animation: giftBounce 2.5s infinite ease-in-out;
+        }
+
+        .gift-box-item:hover {
+            transform: scale(1.12) !important;
+        }
+
+        .gift-shaking {
+            animation: giftShake 0.6s ease-in-out !important;
+        }
+
+        /* โหมดกลางคืน / เข้านอน */
+        .night-overlay {
+            background: radial-gradient(circle at 38% 62%, rgba(255, 183, 77, 0.15) 0%, rgba(15, 23, 42, 0.88) 65%);
+            transition: opacity 1.5s ease;
+        }
+
+        /* ซานต้าบินผ่าน */
+        @keyframes santaFly {
+            0% { transform: translate(-120px, 30px) rotate(-5deg) scale(0.8); opacity: 0; }
+            20% { opacity: 1; }
+            50% { transform: translate(110px, -10px) rotate(2deg) scale(1); opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translate(340px, 20px) rotate(-3deg) scale(0.85); opacity: 0; }
+        }
+
+        .santa-sleigh-anim {
+            animation: santaFly 6s ease-in-out infinite;
+        }
+
+        /* Zzz ลอยขึ้น */
+        @keyframes floatZzz {
+            0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
+            30% { opacity: 1; }
+            100% { transform: translate(20px, -45px) scale(1.3); opacity: 0; }
+        }
+
+        .zzz-1 { animation: floatZzz 2.5s infinite ease-out; }
+        .zzz-2 { animation: floatZzz 2.5s infinite ease-out 0.8s; }
+        .zzz-3 { animation: floatZzz 2.5s infinite ease-out 1.6s; }
+
+        /* แสงแดดยามเช้า */
+        .morning-sunbeam {
+            background: linear-gradient(125deg, rgba(255, 243, 176, 0.45) 0%, rgba(255, 255, 255, 0) 60%);
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5ebe0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d5bdaf;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header / แถบควบคุมด้านบน -->
+    <header class="w-full bg-[#fffcf7] border-b-2 border-[#5c4d3c] px-3 py-2.5 sm:px-6 flex flex-wrap items-center justify-between gap-2 z-40 shadow-sm">
+        <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 rounded-full bg-[#f2cc8f] border-2 border-[#5c4d3c] flex items-center justify-center text-xl shadow-sm">
+                🎄
+            </div>
+            <div>
+                <h1 class="text-base sm:text-xl font-bold text-[#4a3f35] leading-tight">
+                    บ้านอุ่นไอรักวันคริสต์มาส
+                </h1>
+                <p class="text-xs text-[#7f6d5c] hidden sm:block">
+                    ตกแต่งเตาผิงกับต้นคริสต์มาส แล้วเข้านอนรอรับของขวัญจากซานต้ากันเถอะ!
+                </p>
+            </div>
+        </div>
+
+        <!-- ปุ่มควบคุมเสียง, สมุดสะสม และปุ่มเข้านอน -->
+        <div class="flex items-center gap-2 flex-wrap">
+            <!-- ปุ่มเสียงเพลง -->
+            <button id="btn-music" onclick="toggleMusic()" class="scrapbook-btn bg-[#f4f1de] hover:bg-[#e9e4c8] px-3 py-1.5 text-xs sm:text-sm font-semibold flex items-center gap-1.5" title="เปิด/ปิดเพลงกล่องดนตรีคริสต์มาส">
+                <span id="music-icon">🔇</span>
+                <span class="hidden md:inline">เพลงกล่องดนตรี</span>
+            </button>
+
+            <!-- ปุ่มเสียงเตาผิง -->
+            <button id="btn-fire-sound" onclick="toggleFireSound()" class="scrapbook-btn bg-[#f4f1de] hover:bg-[#e9e4c8] px-3 py-1.5 text-xs sm:text-sm font-semibold flex items-center gap-1.5" title="เปิด/ปิดเสียงไฟปะทุ">
+                <span id="fire-sound-icon">🪵</span>
+                <span class="hidden md:inline">เสียงฟืนไฟ</span>
+            </button>
+
+            <!-- ปุ่มสมุดสะสมของขวัญ -->
+            <button onclick="openCollectionModal()" class="scrapbook-btn bg-[#f2cc8f] hover:bg-[#eab96b] px-3 py-1.5 text-xs sm:text-sm font-semibold flex items-center gap-1.5 relative">
+                <span>🎁</span>
+                <span>ของขวัญของฉัน</span>
+                <span id="collection-badge" class="bg-[#e07a5f] text-white text-[11px] font-bold px-1.5 py-0.2 rounded-full border border-[#5c4d3c]">0</span>
+            </button>
+
+            <!-- ปุ่มเข้านอน / ตื่นนอน -->
+            <button id="btn-sleep-cycle" onclick="handleSleepCycle()" class="scrapbook-btn bg-[#81b29a] hover:bg-[#6d9e86] text-white px-3.5 py-1.5 text-xs sm:text-sm font-bold flex items-center gap-1.5">
+                <span id="sleep-btn-icon">🌙</span>
+                <span id="sleep-btn-text">เข้านอนรอซานต้า</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- พื้นที่หลัก: ห้องนั่งเล่นคริสต์มาส + แถบเครื่องมือตกแต่ง -->
+    <main class="flex-1 flex flex-col max-w-6xl w-full mx-auto p-2 sm:p-4 gap-3">
+
+        <!-- แถบแจ้งเตือนสถานะ / คำแนะนำสั้นๆ -->
+        <div id="status-banner" class="bg-[#fffcf7] border-2 border-[#5c4d3c] rounded-2xl px-4 py-2 flex items-center justify-between gap-2 text-xs sm:text-sm shadow-sm">
+            <div class="flex items-center gap-2">
+                <span id="status-emoji" class="text-lg">🖐️</span>
+                <span id="status-message" class="font-medium text-[#4a3f35]">
+                    ลากของตกแต่งไปวางบนต้นไม้หรือเตาผิงได้เลย! (และลากย้ายชิ้นที่วางแล้วได้ตลอดเวลา)
+                </span>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+                <span class="text-xs text-[#7f6d5c] hidden sm:inline">ความอบอุ่นของห้อง:</span>
+                <div class="w-20 sm:w-28 h-3.5 bg-[#ede0d4] rounded-full border border-[#5c4d3c] overflow-hidden p-0.5">
+                    <div id="cozy-meter-bar" class="h-full bg-gradient-to-r from-[#f2cc8f] to-[#e07a5f] rounded-full transition-all duration-300" style="width: 15%;"></div>
+                </div>
+                <span id="cozy-score-text" class="text-xs font-bold text-[#e07a5f]">15%</span>
+            </div>
+        </div>
+
+        <!-- ฉากห้องนั่งเล่น (Interactive Canvas Area) -->
+        <div id="living-room-stage" class="relative w-full h-[460px] sm:h-[540px] md:h-[580px] room-wallpaper rounded-3xl border-[3px] border-[#5c4d3c] shadow-lg overflow-hidden select-none">
+            
+            <!-- แสงแดดยามเช้า (แสดงหลังตื่นนอน) -->
+            <div id="morning-sunbeam" class="absolute inset-0 morning-sunbeam opacity-0 transition-opacity duration-1000 z-10"></div>
+
+            <!-- 1. หน้าต่างมองเห็นหิมะตกด้านนอก (ซ้ายบน) -->
+            <div class="absolute top-6 left-4 sm:left-10 w-36 sm:w-48 h-44 sm:h-56 bg-[#2b3a4a] rounded-t-full border-4 border-[#6f5e53] shadow-inner overflow-hidden z-0" id="room-window">
+                <!-- ท้องฟ้านอกหน้าต่าง -->
+                <div id="window-sky" class="absolute inset-0 bg-gradient-to-b from-[#3d5a80] via-[#6b9ac4] to-[#cce3de] transition-colors duration-1000"></div>
+                
+                <!-- ดวงจันทร์ / ดวงอาทิตย์นอกหน้าต่าง -->
+                <div id="window-celestial" class="absolute top-6 right-7 w-7 h-7 rounded-full bg-[#fff3b0] shadow-[0_0_15px_#fff3b0] transition-all duration-1000"></div>
+
+                <!-- ภูเขาหิมะไกลๆ -->
+                <svg class="absolute bottom-0 w-full h-24" viewBox="0 0 200 100" preserveAspectRatio="none">
+                    <path d="M0,100 L0,60 Q50,25 100,65 T200,50 L200,100 Z" fill="#e2ece9" />
+                    <path d="M0,100 L0,75 Q70,45 140,75 T200,68 L200,100 Z" fill="#ffffff" />
+                </svg>
+
+                <!-- คอนเทนเนอร์หิมะตก -->
+                <div id="snow-container" class="absolute inset-0 pointer-events-none"></div>
+
+                <!-- ซานต้าขี่เลื่อนกวางเรนเดียร์ (โผล่ตอนกลางคืน) -->
+                <div id="santa-window-fly" class="hidden absolute top-10 left-0 pointer-events-none santa-sleigh-anim">
+                    <svg width="85" height="35" viewBox="0 0 120 50">
+                        <!-- ละอองดาว -->
+                        <circle cx="10" cy="25" r="2" fill="#fff3b0"/>
+                        <circle cx="20" cy="18" r="1.5" fill="#fff3b0"/>
+                        <circle cx="18" cy="32" r="2" fill="#f2cc8f"/>
+                        <!-- เลื่อนซานต้า -->
+                        <path d="M30,32 Q45,38 62,32 L58,22 L35,22 Z" fill="#e07a5f"/>
+                        <path d="M26,35 Q45,42 66,35" stroke="#f2cc8f" stroke-width="2.5" fill="none"/>
+                        <!-- ซานต้า -->
+                        <circle cx="45" cy="17" r="6" fill="#e07a5f"/>
+                        <circle cx="46" cy="12" r="4" fill="#ffe5d9"/>
+                        <path d="M42,10 L46,4 L50,10 Z" fill="#d62828"/>
+                        <!-- กวางเรนเดียร์ -->
+                        <line x1="62" y1="26" x2="88" y2="24" stroke="#f2cc8f" stroke-width="1.5"/>
+                        <ellipse cx="92" cy="24" rx="8" ry="5" fill="#8d5b4c"/>
+                        <circle cx="100" cy="18" r="4.5" fill="#8d5b4c"/>
+                        <circle cx="104" cy="18" r="1.8" fill="#ff4d4d"/>
+                        <path d="M99,14 L97,8 M101,14 L103,8" stroke="#5c4d3c" stroke-width="1.5"/>
+                    </svg>
+                </div>
+
+                <!-- กรอบไม้กากบาทหน้าต่าง -->
+                <div class="absolute inset-0 border-4 border-[#8d6e63] rounded-t-full pointer-events-none"></div>
+                <div class="absolute top-0 bottom-0 left-1/2 w-2 -translate-x-1/2 bg-[#8d6e63] pointer-events-none"></div>
+                <div class="absolute left-0 right-0 top-1/2 h-2 -translate-y-1/2 bg-[#8d6e63] pointer-events-none"></div>
+                <!-- ขอบหน้าต่างด้านล่าง -->
+                <div class="absolute bottom-0 left-0 right-0 h-3 bg-[#6f5e53]"></div>
+            </div>
+
+            <!-- กรอบรูปเล็กๆ ตกแต่งผนังด้านบนขวา -->
+            <div class="hidden sm:flex absolute top-8 right-8 md:right-14 gap-4 opacity-90 pointer-events-none">
+                <div class="w-16 h-20 bg-[#fffcf7] border-2 border-[#5c4d3c] rounded-lg p-1.5 shadow-sm -rotate-3 flex flex-col items-center justify-center">
+                    <span class="text-2xl">⛄</span>
+                    <span class="text-[9px] text-[#7f6d5c] mt-1 font-semibold">Winter '26</span>
+                </div>
+                <div class="w-16 h-16 bg-[#fffcf7] border-2 border-[#5c4d3c] rounded-full p-1.5 shadow-sm rotate-6 flex items-center justify-center">
+                    <span class="text-2xl">🦌</span>
+                </div>
+            </div>
+
+            <!-- 2. พื้นไม้ห้องนั่งเล่น & พรมวงกลม -->
+            <div class="absolute bottom-0 left-0 right-0 h-28 sm:h-32 wood-floor z-0">
+                <!-- พรมถักพาสเทลนุ่มๆ -->
+                <div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-[90%] max-w-3xl h-20 sm:h-24 bg-[#f4e4d7] border-4 border-dashed border-[#e07a5f] rounded-[100%] shadow-inner opacity-95"></div>
+            </div>
+
+            <!-- 3. เตาผิงอิฐสไตล์แฮนด์เมด (ฝั่งซ้าย-กลาง) -->
+            <div id="fireplace-zone" class="absolute bottom-14 sm:bottom-16 left-[3%] sm:left-[8%] md:left-[12%] w-[48%] sm:w-[42%] max-w-[340px] h-[255px] sm:h-[300px] z-10 flex flex-col items-center">
+                <!-- ป้ายแนะนำโซนเตาผิง -->
+                <div class="absolute -top-6 bg-[#fffcf7]/90 border border-[#5c4d3c] px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-[#5c4d3c] shadow-sm pointer-events-none">
+                    🔥 หิ้งเตาผิง (วางของตกแต่งได้)
+                </div>
+
+                <!-- SVG เตาผิง -->
+                <svg viewBox="0 0 320 290" class="w-full h-full drop-shadow-md overflow-visible">
+                    <!-- ปล่องไฟด้านบน -->
+                    <rect x="45" y="0" width="230" height="45" fill="#e6ccb2" stroke="#5c4d3c" stroke-width="3" rx="4"/>
+                    
+                    <!-- หิ้งไม้ด้านบนเตาผิง (Mantelpiece) -->
+                    <rect x="10" y="38" width="300" height="22" fill="#9c6644" stroke="#5c4d3c" stroke-width="3" rx="8"/>
+                    <rect x="18" y="42" width="284" height="6" fill="#b08968" rx="3"/>
+
+                    <!-- ตัวเตาผิงอิฐสีพาสเทลอบอุ่น -->
+                    <rect x="28" y="60" width="264" height="215" fill="#ddbea9" stroke="#5c4d3c" stroke-width="3" rx="6"/>
+                    
+                    <!-- ลวดลายก้อนอิฐน่ารักๆ -->
+                    <g fill="#cb997e" stroke="#5c4d3c" stroke-width="1.5" opacity="0.75">
+                        <rect x="40" y="72" width="42" height="16" rx="3"/>
+                        <rect x="90" y="72" width="48" height="16" rx="3"/>
+                        <rect x="146" y="72" width="42" height="16" rx="3"/>
+                        <rect x="196" y="72" width="46" height="16" rx="3"/>
+                        <rect x="250" y="72" width="30" height="16" rx="3"/>
+
+                        <rect x="40" y="102" width="35" height="16" rx="3"/>
+                        <rect x="245" y="102" width="35" height="16" rx="3"/>
+
+                        <rect x="40" y="135" width="35" height="16" rx="3"/>
+                        <rect x="245" y="135" width="35" height="16" rx="3"/>
+
+                        <rect x="40" y="170" width="35" height="16" rx="3"/>
+                        <rect x="245" y="170" width="35" height="16" rx="3"/>
+
+                        <rect x="40" y="205" width="35" height="16" rx="3"/>
+                        <rect x="245" y="205" width="35" height="16" rx="3"/>
+                    </g>
+
+                    <!-- ช่องเตาผิงด้านใน -->
+                    <path d="M85,275 L85,145 Q85,105 160,105 Q235,105 235,145 L235,275 Z" fill="#3d312e" stroke="#5c4d3c" stroke-width="3.5"/>
+                    <!-- ผนังอิฐดำด้านในเตาผิง -->
+                    <path d="M95,275 L95,150 Q95,118 160,118 Q225,118 225,150 L225,275 Z" fill="#2b211f"/>
+
+                    <!-- แสงเรืองรองจากกองไฟ -->
+                    <ellipse id="fireplace-glow" cx="160" cy="225" rx="62" ry="45" fill="url(#fireGlowGrad)" opacity="0.85"/>
+                    <defs>
+                        <radialGradient id="fireGlowGrad" cx="50%" cy="60%" r="50%">
+                            <stop offset="0%" stop-color="#ffba08" stop-opacity="0.7"/>
+                            <stop offset="60%" stop-color="#f48c06" stop-opacity="0.25"/>
+                            <stop offset="100%" stop-color="#f48c06" stop-opacity="0"/>
+                        </radialGradient>
+                    </defs>
+
+                    <!-- ท่อนฟืน -->
+                    <g stroke="#5c4d3c" stroke-width="2.5">
+                        <rect x="115" y="248" width="90" height="14" rx="7" fill="#6f4e37" transform="rotate(-8 160 255)"/>
+                        <rect x="118" y="250" width="88" height="14" rx="7" fill="#583e2b" transform="rotate(9 160 255)"/>
+                        <circle cx="118" cy="250" r="6" fill="#d4a373"/>
+                        <circle cx="202" cy="262" r="6" fill="#d4a373"/>
+                    </g>
+
+                    <!-- เปลวไฟเคลื่อนไหวได้ (กดคลิกเปิด/ปิดไฟได้) -->
+                    <g id="fireplace-flames" class="cursor-pointer" onclick="toggleFireplaceFlame()">
+                        <!-- เปลวไฟชั้นนอก -->
+                        <path class="fire-flame" d="M160,165 C180,195 198,215 188,242 C180,256 140,256 132,242 C122,215 140,195 160,165 Z" fill="#f77f00" stroke="#5c4d3c" stroke-width="2"/>
+                        <!-- เปลวไฟชั้นกลาง -->
+                    <!-- เปลวไฟเคลื่อนไหวได้ -->
+                    <g id="fireplace-flames">
+                        <!-- เปลวไฟชั้นนอก -->
+                        <path class="fire-flame" d="M160,165 C180,195 198,215 188,242 C180,256 140,256 132,242 C122,215 140,195 160,165 Z" fill="#f77f00" stroke="#5c4d3c" stroke-width="2"/>
+                        <!-- เปลวไฟชั้นกลาง -->
+                        <path class="fire-flame-inner" d="M160,185 C174,205 184,220 176,240 C170,250 150,250 144,240 C136,220 146,205 160,185 Z" fill="#fcbf49"/>
+                        <!-- เปลวไฟชั้นในสุด -->
+                        <path class="fire-flame" d="M160,208 C168,220 172,230 167,242 C163,247 157,247 153,242 C148,230 152,220 160,208 Z" fill="#fff3b0"/>
+                    </g>
+
+                    <!-- ฐานเตาผิงด้านล่าง -->
+                    <rect x="14" y="268" width="292" height="18" fill="#b08968" stroke="#5c4d3c" stroke-width="3" rx="6"/>
+                </svg>
+            </div>
+
+            <!-- 4. ต้นคริสต์มาสขนาดใหญ่ (ฝั่งขวา) -->
+            <div id="tree-zone" class="absolute bottom-14 sm:bottom-16 right-[3%] sm:right-[8%] md:right-[12%] w-[46%] sm:w-[40%] max-w-[330px] h-[340px] sm:h-[410px] z-10 flex flex-col items-center">
+                <!-- ป้ายแนะนำโซนต้นคริสต์มาส -->
+                <div class="absolute -top-5 bg-[#fffcf7]/90 border border-[#5c4d3c] px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-[#5c4d3c] shadow-sm pointer-events-none">
+                    🎄 ต้นคริสต์มาส (วางของตกแต่งได้)
+                </div>
+
+                <!-- SVG ต้นคริสต์มาสพาสเทลแฮนด์เมด -->
+                <svg viewBox="0 0 300 380" class="w-full h-full drop-shadow-md overflow-visible">
+                    <!-- กระถาง / ฐานต้นไม้ -->
+                    <path d="M115,325 L185,325 L176,368 L124,368 Z" fill="#bc6c25" stroke="#5c4d3c" stroke-width="3" stroke-linejoin="round"/>
+                    <rect x="108" y="318" width="84" height="12" rx="5" fill="#dda15e" stroke="#5c4d3c" stroke-width="3"/>
+                    
+                    <!-- ลำต้น -->
+                    <rect x="136" y="295" width="28" height="25" fill="#6f4e37" stroke="#5c4d3c" stroke-width="3"/>
+
+                    <!-- พุ่มใบชั้นล่างสุด (ชั้นที่ 3) -->
+                    <path d="M150,165 C105,215 55,255 25,295 C65,305 105,295 150,305 C195,295 235,305 275,295 C245,255 195,215 150,165 Z" 
+                          fill="#6a994e" stroke="#5c4d3c" stroke-width="3.5" stroke-linejoin="round"/>
+                    <!-- เงาใบไม้ชั้นล่าง -->
+                    <path d="M60,285 Q90,275 115,288 M185,288 Q210,275 240,285" stroke="#386641" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+
+                    <!-- พุ่มใบชั้นกลาง (ชั้นที่ 2) -->
+                    <path d="M150,95 C110,145 70,185 45,220 C85,230 115,220 150,230 C185,220 215,230 255,220 C230,185 190,145 150,95 Z" 
+                          fill="#81b29a" stroke="#5c4d3c" stroke-width="3.5" stroke-linejoin="round"/>
+                    <!-- เงาใบไม้ชั้นกลาง -->
+                    <path d="M75,210 Q105,200 125,212 M175,212 Q195,200 225,210" stroke="#52796f" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+
+                    <!-- พุ่มใบชั้นบนสุด (ชั้นที่ 1) -->
+                    <path d="M150,25 C120,65 90,105 70,138 C100,148 125,140 150,148 C175,140 200,148 230,138 C210,105 180,65 150,25 Z" 
+                          fill="#a7c957" stroke="#5c4d3c" stroke-width="3.5" stroke-linejoin="round"/>
+                    <!-- เงาใบไม้ชั้นบน -->
+                    <path d="M98,128 Q120,120 135,130 M165,130 Q180,120 202,128" stroke="#6a994e" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+
+                    <!-- จุดนำสายตายอดต้นไม้ (สำหรับวางดาว) -->
+                    <circle cx="150" cy="22" r="6" fill="#fff3b0" stroke="#5c4d3c" stroke-width="1.5" stroke-dasharray="2 2" opacity="0.7"/>
+                </svg>
+            </div>
+
+            <!-- 5. พื้นที่วางของตกแต่งทั้งหมด (วางอิสระทั่วฉาก) -->
+            <div id="decorations-layer" class="absolute inset-0 z-20"></div>
+
+            <!-- 6. พื้นที่วางกล่องของขวัญใต้ต้นคริสต์มาส (ปรากฏตอนตื่นนอนเช้าวันคริสต์มาส) -->
+            <div id="gifts-under-tree-layer" class="absolute bottom-6 sm:bottom-8 right-[2%] sm:right-[6%] md:right-[10%] w-[54%] sm:w-[46%] max-w-[380px] h-28 flex items-end justify-center flex-wrap gap-2 z-30 pointer-events-none">
+                <!-- กล่องของขวัญจะถูกสร้างด้วย JS -->
+            </div>
+
+            <!-- 7. แถบเครื่องมือปรับแต่งไอเทมที่เลือกอยู่ (ปุ่มลอยขนาดกะทัดรัดตามตำแหน่งไอเทม) -->
+            <div id="item-toolbar" class="hidden absolute -translate-x-1/2 bg-[#fffcf7]/95 backdrop-blur-xs border-2 border-[#5c4d3c] rounded-full px-2.5 py-1 shadow-[3px_3px_0px_#5c4d3c] z-40 flex items-center gap-1.5 transition-opacity duration-150">
+                <button onclick="rotateSelectedItem(-15)" class="w-7 h-7 rounded-full bg-[#f4f1de] hover:bg-[#e9e4c8] border border-[#5c4d3c] flex items-center justify-center text-xs font-bold" title="หมุนซ้าย">↺</button>
+                <button onclick="rotateSelectedItem(15)" class="w-7 h-7 rounded-full bg-[#f4f1de] hover:bg-[#e9e4c8] border border-[#5c4d3c] flex items-center justify-center text-xs font-bold" title="หมุนขวา">↻</button>
+                <button onclick="scaleSelectedItem(-0.15)" class="w-7 h-7 rounded-full bg-[#f4f1de] hover:bg-[#e9e4c8] border border-[#5c4d3c] flex items-center justify-center text-xs font-bold" title="ย่อเล็กลง">➖</button>
+                <button onclick="scaleSelectedItem(0.15)" class="w-7 h-7 rounded-full bg-[#f4f1de] hover:bg-[#e9e4c8] border border-[#5c4d3c] flex items-center justify-center text-xs font-bold" title="ขยายใหญ่ขึ้น">➕</button>
+                <button onclick="deleteSelectedItem()" class="w-7 h-7 rounded-full bg-[#e07a5f] text-white hover:bg-[#d06549] border border-[#5c4d3c] flex items-center justify-center text-xs" title="ลบชิ้นนี้">🗑️</button>
+                <button onclick="deselectItem()" class="w-6 h-6 rounded-full bg-[#ede0d4] hover:bg-[#d5bdaf] text-[#4a3f35] text-[10px] font-bold flex items-center justify-center" title="ปิดแถบเครื่องมือ">✕</button>
+            </div>
+
+            <!-- 8. เลเยอร์บรรยากาศกลางคืน / เข้านอน -->
+            <div id="night-sleep-overlay" class="hidden absolute inset-0 night-overlay z-30 flex flex-col items-center justify-center p-4 text-center">
+                <div class="bg-[#1e293b]/85 backdrop-blur-sm border-2 border-[#f2cc8f] rounded-3xl p-5 sm:p-7 max-w-md shadow-2xl text-white">
+                    <div class="relative inline-block mb-2">
+                        <span class="text-5xl sm:text-6xl block">🛌</span>
+                        <span class="zzz-1 absolute -top-2 -right-3 text-lg font-bold text-[#f2cc8f]">Z</span>
+                        <span class="zzz-2 absolute -top-5 -right-6 text-xl font-bold text-[#fff3b0]">z</span>
+                        <span class="zzz-3 absolute -top-8 -right-9 text-2xl font-bold text-[#81b29a]">Z</span>
+                    </div>
+                    <h2 id="sleep-title" class="text-lg sm:text-xl font-bold text-[#fff3b0] mb-2">
+                        กำลังหลับฝันดีในคืนคริสต์มาสอีฟ...
+                    </h2>
+                    <p id="sleep-subtitle" class="text-xs sm:text-sm text-[#e2e8f0] leading-relaxed mb-4">
+                        ซานตาคลอสกำลังแอบย่องลงมาจากปล่องไฟ<br>เพื่อวางของขวัญสุดพิเศษไว้ใต้ต้นคริสต์มาสของคุณ 🎅✨
+                    </p>
+                    
+                    <!-- แถบโหลดความคืบหน้าการนอน -->
+                    <div id="sleep-progress-wrap" class="w-full bg-[#334155] h-3 rounded-full overflow-hidden border border-[#f2cc8f]/50 mb-4">
+                        <div id="sleep-progress-bar" class="h-full bg-gradient-to-r from-[#81b29a] via-[#f2cc8f] to-[#e07a5f] transition-all duration-300" style="width: 0%;"></div>
+                    </div>
+
+                    <!-- ปุ่มตื่นนอน (จะเด้งขึ้นมาเมื่อซานต้าวางของขวัญเสร็จ) -->
+                    <button id="btn-wake-up" onclick="wakeUpMorning()" class="hidden scrapbook-btn bg-[#f2cc8f] hover:bg-[#eab96b] text-[#4a3f35] px-5 py-2.5 text-sm sm:text-base font-bold mx-auto flex items-center gap-2 animate-bounce">
+                        <span>☀️</span>
+                        <span>ตื่นนอน! เช้าวันคริสต์มาสแล้ว</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- กล่องเก็บของตกแต่ง (Decoration Tray) ด้านล่าง -->
+        <section class="scrapbook-card p-3 sm:p-4 flex flex-col gap-3">
+            <!-- แถบหมวดหมู่ & ปุ่มลัด -->
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b-2 border-[#ede0d4] pb-2.5">
+                <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 sm:pb-0">
+                    <button onclick="switchCategory('tree')" id="tab-tree" class="scrapbook-btn bg-[#81b29a] text-white px-3 py-1.5 text-xs sm:text-sm font-bold flex items-center gap-1.5 shrink-0">
+                        <span>🎄</span> ของแต่งต้นคริสต์มาส
+                    </button>
+                    <button onclick="switchCategory('fireplace')" id="tab-fireplace" class="scrapbook-btn bg-[#f4f1de] text-[#4a3f35] px-3 py-1.5 text-xs sm:text-sm font-bold flex items-center gap-1.5 shrink-0">
+                        <span>🧦</span> ของแต่งเตาผิง
+                    </button>
+                    <button onclick="switchCategory('lights')" id="tab-lights" class="scrapbook-btn bg-[#f4f1de] text-[#4a3f35] px-3 py-1.5 text-xs sm:text-sm font-bold flex items-center gap-1.5 shrink-0">
+                        <span>✨</span> ไฟประดับและพวงมาลัย
+                    </button>
+                </div>
+
+                <!-- ปุ่มล้างทั้งหมด -->
+                <div class="flex items-center gap-2 ml-auto">
+                    <button onclick="confirmClearDecorations()" class="scrapbook-btn bg-[#f4f1de] hover:bg-[#e07a5f] hover:text-white px-2.5 py-1.5 text-xs font-bold flex items-center gap-1" title="เก็บของตกแต่งทั้งหมด">
+                        <span>🧹</span> <span class="hidden sm:inline">ล้างทั้งหมด</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- รายการไอเทมในหมวดหมู่ที่เลือก -->
+            <div class="flex items-center gap-2">
+                <p class="text-[11px] text-[#7f6d5c] hidden md:block w-32 shrink-0 leading-snug">
+                    🖐️ <b>จับลากได้เลย:</b> ลากไอเทมขึ้นไปวางบนต้นไม้หรือเตาผิง หรือแตะวางก็ได้!
+                </p>
+                <div id="tray-items-container" class="flex-1 flex items-center gap-2.5 overflow-x-auto py-1.5 px-1">
+                    <!-- ไอเทมจะถูกสร้างจาก JavaScript -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal: แกะกล่องของขวัญ (Gift Unboxing Modal) -->
+    <div id="unbox-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="scrapbook-card bg-[#fffcf7] max-w-md w-full p-6 text-center relative overflow-hidden">
+            <!-- พลุกระดาษ Confetti -->
+            <div id="confetti-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+
+            <div class="inline-block bg-[#f2cc8f] border-2 border-[#5c4d3c] rounded-full px-3 py-0.5 text-xs font-bold text-[#4a3f35] mb-3">
+                🎉 ของขวัญวันคริสต์มาสจากซานต้า!
+            </div>
+
+            <!-- รูปไอเทมของขวัญที่ได้รับ -->
+            <div id="unbox-item-visual" class="w-32 h-32 mx-auto my-2 bg-[#fdf6ec] border-2 border-dashed border-[#e07a5f] rounded-3xl flex items-center justify-center text-6xl shadow-inner transform transition-transform duration-500 scale-100">
+                🧸
+            </div>
+
+            <h3 id="unbox-item-name" class="text-xl sm:text-2xl font-bold text-[#e07a5f] mt-3 mb-1">
+                ตุ๊กตาหมีถักไหมพรมแสนอุ่น
+            </h3>
+
+            <span id="unbox-item-rarity" class="inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#81b29a]/20 text-[#386641] border border-[#81b29a] mb-3">
+                ระดับ: แสนอบอุ่นหัวใจ
+            </span>
+
+            <div class="bg-[#fdf6ec] border-2 border-[#e6ccb2] rounded-2xl p-3.5 mb-5 text-sm text-[#4a3f35] leading-relaxed">
+                <p id="unbox-item-blessing" class="italic">
+                    "ขอให้วันคริสต์มาสปีนี้โอบกอดคุณด้วยความอบอุ่นและรอยยิ้มที่สดใสในทุกๆ วันนะ"
+                </p>
+            </div>
+
+            <button onclick="closeUnboxModal()" class="scrapbook-btn bg-[#81b29a] hover:bg-[#6d9e86] text-white w-full py-2.5 text-base font-bold">
+                เก็บเข้าสมุดสะสมของขวัญ 💖
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal: สมุดสะสมของขวัญ (Gift Collection Scrapbook) -->
+    <div id="collection-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="scrapbook-card bg-[#fffcf7] max-w-lg w-full max-h-[85vh] flex flex-col p-5">
+            <div class="flex items-center justify-between border-b-2 border-[#ede0d4] pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">📖</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-[#4a3f35]">สมุดสะสมของขวัญคริสต์มาส</h3>
+                        <p class="text-xs text-[#7f6d5c]">สะสมของขวัญสุดน่ารักที่ได้รับจากซานตาคลอส</p>
+                    </div>
+                </div>
+                <button onclick="closeCollectionModal()" class="w-8 h-8 rounded-full bg-[#f4f1de] border border-[#5c4d3c] font-bold text-sm hover:bg-[#e07a5f] hover:text-white">✕</button>
+            </div>
+
+            <div id="collection-grid" class="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-3 p-1">
+                <!-- รายการของขวัญที่สะสมได้ -->
+            </div>
+
+            <div class="mt-4 pt-3 border-t-2 border-[#ede0d4] flex items-center justify-between text-xs text-[#7f6d5c]">
+                <span id="collection-count-text">สะสมได้แล้ว 0 / 10 ชิ้น</span>
+                <button onclick="closeCollectionModal()" class="scrapbook-btn bg-[#f2cc8f] text-[#4a3f35] px-4 py-1.5 font-bold">ปิดหน้าต่าง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: ยืนยันการล้างของตกแต่ง (แทน confirm() เพื่อความสวยงาม) -->
+    <div id="confirm-clear-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="scrapbook-card bg-[#fffcf7] max-w-sm w-full p-5 text-center">
+            <div class="text-4xl mb-2">🧹</div>
+            <h3 class="text-lg font-bold text-[#4a3f35] mb-1">เก็บของตกแต่งทั้งหมด?</h3>
+            <p class="text-xs sm:text-sm text-[#7f6d5c] mb-4">คุณต้องการเก็บของตกแต่งบนต้นคริสต์มาสและเตาผิงทั้งหมดใช่ไหมคะ?</p>
+            <div class="flex gap-2 justify-center">
+                <button onclick="closeConfirmClearModal()" class="scrapbook-btn bg-[#f4f1de] px-4 py-2 text-sm font-bold flex-1">ยกเลิก</button>
+                <button onclick="clearAllDecorations()" class="scrapbook-btn bg-[#e07a5f] text-white px-4 py-2 text-sm font-bold flex-1">เก็บทั้งหมด</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ไอคอนลอยตามนิ้ว/เมาส์ขณะลากจากถาดเครื่องมือ -->
+    <div id="drag-ghost" class="hidden fixed pointer-events-none z-50 -translate-x-1/2 -translate-y-1/2 scale-125 drop-shadow-[0_10px_12px_rgba(92,77,60,0.4)] transition-transform duration-75"></div>
+
+    <script>
+        /* ==========================================================================
+           1. ข้อมูลไอเทมตกแต่ง (SVG วาดมือสไตล์พาสเทล) และข้อมูลของขวัญ
+           ========================================================================== */
+        const DECORATION_CATALOG = {
+            tree: [
+                {
+                    id: 'star_topper',
+                    name: 'ดาวทองยอดต้นไม้',
+                    size: 54,
+                    svg: `<svg viewBox="0 0 60 60" width="100%" height="100%">
+                            <polygon points="30,4 37,21 56,22 41,34 46,52 30,42 14,52 19,34 4,22 23,21" fill="#ffd166" stroke="#5c4d3c" stroke-width="3" stroke-linejoin="round"/>
+                            <circle cx="26" cy="24" r="3" fill="#fff"/>
+                          </svg>`
+                },
+                {
+                    id: 'bauble_red',
+                    name: 'ลูกบอลสีแดงพาสเทล',
+                    size: 36,
+                    svg: `<svg viewBox="0 0 50 50" width="100%" height="100%">
+                            <rect x="21" y="4" width="8" height="6" rx="2" fill="#f2cc8f" stroke="#5c4d3c" stroke-width="2"/>
+                            <circle cx="25" cy="28" r="18" fill="#e07a5f" stroke="#5c4d3c" stroke-width="2.5"/>
+                            <path d="M10,28 Q25,36 40,28" stroke="#fff3b0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                            <circle cx="19" cy="20" r="3" fill="#fff" opacity="0.7"/>
+                          </svg>`
+                },
+                {
+                    id: 'bauble_mint',
+                    name: 'ลูกบอลสีเขียวมิ้นต์',
+                    size: 36,
+                    svg: `<svg viewBox="0 0 50 50" width="100%" height="100%">
+                            <rect x="21" y="4" width="8" height="6" rx="2" fill="#f2cc8f" stroke="#5c4d3c" stroke-width="2"/>
+                            <circle cx="25" cy="28" r="18" fill="#81b29a" stroke="#5c4d3c" stroke-width="2.5"/>
+                            <circle cx="25" cy="28" r="3" fill="#fff3b0"/>
+                            <circle cx="17" cy="24" r="2" fill="#fff3b0"/>
+                            <circle cx="33" cy="32" r="2" fill="#fff3b0"/>
+                            <circle cx="19" cy="19" r="3" fill="#fff" opacity="0.6"/>
+                          </svg>`
+                },
+                {
+                    id: 'bauble_gold',
+                    name: 'ลูกบอลสีเหลืองนวล',
+                    size: 36,
+                    svg: `<svg viewBox="0 0 50 50" width="100%" height="100%">
+                            <rect x="21" y="4" width="8" height="6" rx="2" fill="#e07a5f" stroke="#5c4d3c" stroke-width="2"/>
+                            <circle cx="25" cy="28" r="18" fill="#f2cc8f" stroke="#5c4d3c" stroke-width="2.5"/>
+                            <path d="M12,22 L38,22 M12,34 L38,34" stroke="#e07a5f" stroke-width="2.5"/>
+                          </svg>`
+                },
+                {
+                    id: 'candy_cane',
+                    name: 'ลูกกวาดแคนดี้เคน',
+                    size: 42,
+                    svg: `<svg viewBox="0 0 50 50" width="100%" height="100%">
+                            <path d="M18,22 C18,10 34,10 34,22 L34,42 C34,45 27,45 27,42 L27,22 C27,18 24,18 24,22 C24,25 18,25 18,22 Z" fill="#fff" stroke="#5c4d3c" stroke-width="2.5"/>
+                            <path d="M27,28 L34,25 M27,36 L34,33 M20,16 L25,20 M30,13 L33,18" stroke="#e07a5f" stroke-width="3.5"/>
+                          </svg>`
+                },
+                {
+                    id: 'gingerbread',
+                    name: 'ตุ๊กตาขนมปังขิง',
+                    size: 42,
+                    svg: `<svg viewBox="0 0 50 50" width="100%" height="100%">
+                            <circle cx="25" cy="13" r="8" fill="#bc6c25" stroke="#5c4d3c" stroke-width="2.2"/>
+                            <path d="M11,23 L39,23 L34,29 L31,29 L34,43 L27,43 L25,34 L23,43 L16,43 L19,29 L16,29 Z" fill="#bc6c25" stroke="#5c4d3c" stroke-width="2.2" stroke-linejoin="round"/>
+                            <circle cx="22.5" cy="11.5" r="1.3" fill="#fff"/>
+                            <circle cx="27.5" cy="11.5" r="1.3" fill="#fff"/>
+                            <path d="M22.5,15 Q25,18 27.5,15" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                            <circle cx="25" cy="25" r="1.8" fill="#e07a5f"/>
+                            <circle cx="25" cy="30" r="1.8" fill="#81b29a"/>
+                          </svg>`
+                },
+                {
+                    id: 'ribbon_bow',
+                    name: 'โบว์ริบบิ้นสีชมพู',
+                    size: 40,
+                    svg: `<svg viewBox="0 0 50 50" width="100%" height="100%">
+                            <path d="M25,25 L10,14 C6,18 6,28 10,32 Z" fill="#f4978e" stroke="#5c4d3c" stroke-width="2.2" stroke-linejoin="round"/>
+                            <path d="M25,25 L40,14 C44,18 44,28 40,32 Z" fill="#f4978e" stroke="#5c4d3c" stroke-width="2.2" stroke-linejoin="round"/>
+                            <path d="M22,27 L15,42 L20,40 L24,29 M28,27 L35,42 L30,40 L26,29" fill="#f4978e" stroke="#5c4d3c" stroke-width="2"/>
+                            <circle cx="25" cy="24" r="4.5" fill="#e07a5f" stroke="#5c4d3c" stroke-width="2"/>
+                          </svg>`
+                },
+                {
+                    id: 'bell_gold',
+                    name: 'กระดิ่งทองกรุ๊งกริ๊ง',
+                    size: 38,
+                    svg: `<svg viewBox="0 0 50 50" width="100%" height="100%">
+                            <path d="M25,10 C16,10 13,20 11,33 L39,33 C37,20 34,10 25,10 Z" fill="#f2cc8f" stroke="#5c4d3c" stroke-width="2.5" stroke-linejoin="round"/>
+                            <circle cx="25" cy="36" r="4" fill="#e07a5f" stroke="#5c4d3c" stroke-width="2"/>
+                            <path d="M18,10 Q25,5 32,10" stroke="#e07a5f" stroke-width="3" fill="none" stroke-linecap="round"/>
+                          </svg>`
+                }
+            ],
+            fireplace: [
+                {
+                    id: 'stocking_red',
+                    name: 'ถุงเท้าซานต้าลายจุด',
+                    size: 52,
+                    svg: `<svg viewBox="0 0 50 60" width="100%" height="100%">
+                            <path d="M18,12 L34,12 L34,36 C34,46 22,52 13,48 C7,45 8,37 15,35 L18,34 Z" fill="#e07a5f" stroke="#5c4d3c" stroke-width="2.5" stroke-linejoin="round"/>
+                            <rect x="15" y="7" width="22" height="9" rx="4" fill="#fffcf7" stroke="#5c4d3c" stroke-width="2.5"/>
+                            <circle cx="26" cy="24" r="2.2" fill="#fff3b0"/>
+                            <circle cx="22" cy="32" r="2.2" fill="#fff3b0"/>
+                            <circle cx="28" cy="40" r="2.2" fill="#fff3b0"/>
+                          </svg>`
+                },
+                {
+                    id: 'stocking_green',
+                    name: 'ถุงเท้าไหมพรมสีเขียว',
+                    size: 52,
+                    svg: `<svg viewBox="0 0 50 60" width="100%" height="100%">
+                            <path d="M18,12 L34,12 L34,36 C34,46 22,52 13,48 C7,45 8,37 15,35 L18,34 Z" fill="#81b29a" stroke="#5c4d3c" stroke-width="2.5" stroke-linejoin="round"/>
+                            <rect x="15" y="7" width="22" height="9" rx="4" fill="#f2cc8f" stroke="#5c4d3c" stroke-width="2.5"/>
+                            <path d="M18,24 L34,24 M18,32 L34,32" stroke="#fffcf7" stroke-width="2.5" stroke-dasharray="3 2"/>
+                          </svg>`
+                },
+                {
+                    id: 'candle_set',
+                    name: 'เทียนหอมอบอุ่น',
+                    size: 46,
+                    svg: `<svg viewBox="0 0 50 50" width="100%" height="100%">
+                            <rect x="12" y="22" width="11" height="22" rx="2" fill="#fffcf7" stroke="#5c4d3c" stroke-width="2.2"/>
+                            <rect x="26" y="16" width="12" height="28" rx="2" fill="#f4978e" stroke="#5c4d3c" stroke-width="2.2"/>
+                            <path class="fire-flame" d="M17.5,13 Q20,17 17.5,20 Q15,17 17.5,13 Z" fill="#fcbf49" stroke="#5c4d3c" stroke-width="1.2"/>
+                            <path class="fire-flame-inner" d="M32,7 Q34.5,11 32,14 Q29.5,11 32,7 Z" fill="#fcbf49" stroke="#5c4d3c" stroke-width="1.2"/>
+                            <ellipse cx="25" cy="44" rx="18" ry="3.5" fill="#f2cc8f" stroke="#5c4d3c" stroke-width="2"/>
+                          </svg>`
+                },
+                {
+                    id: 'mini_snowman',
+                    name: 'ตุ๊กตาหิมะตัวจิ๋ว',
+                    size: 48,
+                    svg: `<svg viewBox="0 0 50 55" width="100%" height="100%">
+                            <circle cx="25" cy="38" r="12" fill="#fffcf7" stroke="#5c4d3c" stroke-width="2.3"/>
+                            <circle cx="25" cy="21" r="9" fill="#fffcf7" stroke="#5c4d3c" stroke-width="2.3"/>
+                            <rect x="18" y="8" width="14" height="6" rx="2" fill="#e07a5f" stroke="#5c4d3c" stroke-width="2"/>
+                            <line x1="15" y1="14" x2="35" y2="14" stroke="#5c4d3c" stroke-width="2.5" stroke-linecap="round"/>
+                            <circle cx="22.5" cy="19.5" r="1.4" fill="#5c4d3c"/>
+                            <circle cx="27.5" cy="19.5" r="1.4" fill="#5c4d3c"/>
+                            <polygon points="25,21 31,22.5 25,24" fill="#f77f00"/>
+                            <path d="M17,28 Q25,31 33,28" stroke="#81b29a" stroke-width="4" stroke-linecap="round" fill="none"/>
+                          </svg>`
+                },
+                {
+                    id: 'xmas_card',
+                    name: 'การ์ดอวยพรคริสต์มาส',
+                    size: 44,
+                    svg: `<svg viewBox="0 0 50 50" width="100%" height="100%">
+                            <rect x="8" y="12" width="34" height="28" rx="4" fill="#fffcf7" stroke="#5c4d3c" stroke-width="2.5" transform="rotate(-4 25 25)"/>
+                            <polygon points="25,17 18,31 32,31" fill="#81b29a" stroke="#5c4d3c" stroke-width="1.5"/>
+                            <circle cx="25" cy="16" r="2" fill="#f2cc8f"/>
+                          </svg>`
+                },
+                {
+                    id: 'cozy_lantern',
+                    name: 'โคมไฟวินเทจ',
+                    size: 48,
+                    svg: `<svg viewBox="0 0 50 55" width="100%" height="100%">
+                            <path d="M21,8 Q25,3 29,8" stroke="#5c4d3c" stroke-width="2.5" fill="none"/>
+                            <polygon points="15,15 35,15 31,10 19,10" fill="#5c4d3c"/>
+                            <rect x="16" y="15" width="18" height="26" rx="3" fill="#fff3b0" stroke="#5c4d3c" stroke-width="2.5"/>
+                            <circle cx="25" cy="28" r="6" fill="#fcbf49" opacity="0.8"/>
+                            <rect x="14" y="41" width="22" height="5" rx="2" fill="#5c4d3c"/>
+                          </svg>`
+                }
+            ],
+            lights: [
+                {
+                    id: 'garland_pine',
+                    name: 'พวงมาลัยใบสนติดโบว์',
+                    size: 95,
+                    svg: `<svg viewBox="0 0 120 45" width="100%" height="100%">
+                            <path d="M8,12 Q60,38 112,12" stroke="#52796f" stroke-width="12" stroke-linecap="round" fill="none"/>
+                            <path d="M8,12 Q60,38 112,12" stroke="#81b29a" stroke-width="7" stroke-linecap="round" stroke-dasharray="6 4" fill="none"/>
+                            <circle cx="30" cy="21" r="4" fill="#e07a5f" stroke="#5c4d3c" stroke-width="1.5"/>
+                            <circle cx="60" cy="26" r="4.5" fill="#f2cc8f" stroke="#5c4d3c" stroke-width="1.5"/>
+                            <circle cx="90" cy="21" r="4" fill="#e07a5f" stroke="#5c4d3c" stroke-width="1.5"/>
+                          </svg>`
+                },
+                {
+                    id: 'fairy_lights',
+                    name: 'สายไฟกระพริบหลากสี',
+                    size: 95,
+                    svg: `<svg viewBox="0 0 120 45" width="100%" height="100%">
+                            <path d="M6,14 Q60,36 114,14" stroke="#5c4d3c" stroke-width="2" fill="none"/>
+                            <circle class="twinkle-1" cx="22" cy="21" r="5" fill="#ffadad" stroke="#5c4d3c" stroke-width="1.5"/>
+                            <circle class="twinkle-2" cx="44" cy="26" r="5" fill="#fdffb6" stroke="#5c4d3c" stroke-width="1.5"/>
+                            <circle class="twinkle-3" cx="68" cy="26" r="5" fill="#caffbf" stroke="#5c4d3c" stroke-width="1.5"/>
+                            <circle class="twinkle-1" cx="92" cy="21" r="5" fill="#9bf6ff" stroke="#5c4d3c" stroke-width="1.5"/>
+                          </svg>`
+                },
+                {
+                    id: 'wreath_door',
+                    name: 'พวงหรีดคริสต์มาส',
+                    size: 56,
+                    svg: `<svg viewBox="0 0 60 60" width="100%" height="100%">
+                            <circle cx="30" cy="30" r="19" fill="none" stroke="#6a994e" stroke-width="10"/>
+                            <circle cx="30" cy="30" r="19" fill="none" stroke="#5c4d3c" stroke-width="11" stroke-dasharray="2 8" opacity="0.4"/>
+                            <circle cx="30" cy="30" r="24" fill="none" stroke="#5c4d3c" stroke-width="2"/>
+                            <circle cx="30" cy="30" r="14" fill="none" stroke="#5c4d3c" stroke-width="2"/>
+                            <path d="M23,12 L30,16 L37,12 L34,19 L26,19 Z" fill="#e07a5f" stroke="#5c4d3c" stroke-width="1.5"/>
+                            <circle cx="15" cy="34" r="2.5" fill="#e07a5f"/>
+                            <circle cx="45" cy="34" r="2.5" fill="#e07a5f"/>
+                            <circle cx="30" cy="48" r="2.5" fill="#f2cc8f"/>
+                          </svg>`
+                },
+                {
+                    id: 'gold_tinsel',
+                    name: 'สายรุ้งสีทองวิบวับ',
+                    size: 90,
+                    svg: `<svg viewBox="0 0 120 40" width="100%" height="100%">
+                            <path d="M10,12 Q60,34 110,12" stroke="#f2cc8f" stroke-width="8" stroke-linecap="round" stroke-dasharray="3 5" fill="none"/>
+                            <path d="M10,12 Q60,34 110,12" stroke="#fff3b0" stroke-width="4" stroke-linecap="round" stroke-dasharray="2 6" fill="none"/>
+                          </svg>`
+                }
+            ]
+        };
+
+        /* รายการของขวัญสุดน่ารักที่สุ่มได้ตอนเช้าวันคริสต์มาส */
+        const CHRISTMAS_PRESENTS_POOL = [
+            {
+                id: 'gift_bear',
+                emoji: '🧸',
+                name: 'ตุ๊กตาหมีถักไหมพรมแสนอุ่น',
+                rarity: 'แสนอบอุ่นหัวใจ',
+                blessing: 'ขอให้วันคริสต์มาสปีนี้โอบกอดคุณด้วยความอบอุ่น อ่อนโยน และมีคนคอยเป็นกำลังใจอยู่ข้างๆ เสมอนะ'
+            },
+            {
+                id: 'gift_snowglobe',
+                emoji: '🔮',
+                name: 'ลูกแก้วหิมะบ้านไม้ในฝัน',
+                rarity: 'เวทมนตร์เหมันต์',
+                blessing: 'ทุกครั้งที่เขย่าลูกแก้วใบนี้ ขอให้ความกังวลใจละลายหายไป เหลือไว้เพียงความสุขที่เปล่งประกายดั่งเกล็ดหิมะ'
+            },
+            {
+                id: 'gift_scarf',
+                emoji: '🧣',
+                name: 'ผ้าพันคอไหมพรมถักมือ',
+                rarity: 'แฮนด์เมดสุดคิวท์',
+                blessing: 'ไม่ว่าอากาศข้างนอกจะหนาวเย็นแค่ไหน ขอให้หัวใจของคุณอบอุ่นและปลอดภัยในทุกการเดินทาง'
+            },
+            {
+                id: 'gift_cocoa',
+                emoji: '☕',
+                name: 'ชุดโกโก้ร้อนมาร์ชเมลโลว์',
+                rarity: 'หอมหวานละมุน',
+                blessing: 'ขอให้ชีวิตของคุณเต็มไปด้วยความหอมหวานและช่วงเวลาพักผ่อนที่แสนสบาย เหมือนได้จิบโกโก้อุ่นๆ หน้าเตาผิง'
+            },
+            {
+                id: 'gift_cat',
+                emoji: '🐱',
+                name: 'น้องแมวส้มสวมหมวกซานต้า',
+                rarity: 'แรร์ไอเทมสุดน่ารัก ✨',
+                blessing: 'เมี้ยว! น้องแมวซานต้านำโชคลาภและความสดใสมาส่งให้ถึงหน้าบ้าน ขอให้ยิ้มกว้างๆ ตลอดทั้งปีเลยนะ!'
+            },
+            {
+                id: 'gift_musicbox',
+                emoji: '🎶',
+                name: 'กล่องดนตรีม้าหมุนคริสต์มาส',
+                rarity: 'เสียงเพลงแห่งความสุข',
+                blessing: 'ขอให้ทุกวันของคุณมีจังหวะชีวิตที่ไพเราะ ราบรื่น และเต็มไปด้วยเสียงหัวเราะเหมือนบทเพลงวันคริสต์มาส'
+            },
+            {
+                id: 'gift_ticket',
+                emoji: '🎫',
+                name: 'ตั๋วขอพรวิเศษจากซานต้า',
+                rarity: 'แรร์ไอเทมระดับตำนาน 🌟',
+                blessing: 'ความปรารถนาดีๆ ที่คุณตั้งใจไว้ในใจ ซานตาคลอสได้รับรู้แล้ว และกำลังส่งพลังใจให้สมหวังในเร็ววัน!'
+            },
+            {
+                id: 'gift_cookies',
+                emoji: '🍪',
+                name: 'โหลคุกกี้เนยสดอบใหม่',
+                rarity: 'อร่อยชวนฝัน',
+                blessing: 'ความสุขเล็กๆ น้อยๆ ในทุกวัน คือสิ่งที่ทำให้ชีวิตวิเศษที่สุด ขอให้เจอเรื่องน่าประทับใจในทุกๆ เช้านะ'
+            },
+            {
+                id: 'gift_camera',
+                emoji: '📸',
+                name: 'กล้องโพลารอยด์เก็บความทรงจำ',
+                rarity: 'บันทึกความสุข',
+                blessing: 'ขอให้ปีใหม่ที่กำลังจะมาถึง มีแต่ภาพความทรงจำที่สวยงามจนอยากเก็บใส่กรอบไว้ตลอดไป'
+            },
+            {
+                id: 'gift_plant',
+                emoji: '🪴',
+                name: 'ต้นสนจิ๋วในกระถางดินเผา',
+                rarity: 'เติบโตอย่างสดใส',
+                blessing: 'ขอให้คุณเติบโตอย่างแข็งแรง สดใส และเบ่งบานในแบบที่ตัวเองภาคภูมิใจที่สุด'
+            }
+        ];
+
+        /* ==========================================================================
+           2. ตัวแปรสถานะของแอปพลิเคชัน (App State)
+           ========================================================================== */
+        let currentCategory = 'tree';
+        let placedDecorations = []; // เก็บรายการของตกแต่งที่วางบนฉาก
+        let selectedPlacementId = null; // ID ของชิ้นที่กำลังถูกเลือกบนฉาก
+        let selectedTrayItem = null; // ไอเทมจากถาดที่ผู้ใช้คลิกเลือกเพื่อนำไปจิ้มวาง
+        let roomPhase = 'decorating'; // 'decorating' | 'sleeping' | 'morning'
+        let spawnedGifts = []; // กล่องของขวัญใต้ต้นคริสต์มาส
+        let collectedGiftIds = []; // สมุดสะสมของขวัญ (โหลดจาก localStorage)
+        let currentUnboxingGiftIndex = null;
+
+        // ระบบเสียง Web Audio API
+        let audioCtx = null;
+        let isMusicPlaying = false;
+        let musicInterval = null;
+        let isFireSoundPlaying = false;
+        let fireNoiseNode = null;
+        let fireGainNode = null;
+
+        /* ==========================================================================
+           4. ระบบหิมะตกนอกหน้าต่าง
+           ========================================================================== */
+        function createSnowflakes() {
+            const container = document.getElementById('snow-container');
+            container.innerHTML = '';
+            for (let i = 0; i < 24; i++) {
+                const flake = document.createElement('div');
+                flake.className = 'snowflake absolute rounded-full bg-white';
+                const size = Math.random() * 4 + 2;
+                flake.style.width = `${size}px`;
+                flake.style.height = `${size}px`;
+                flake.style.left = `${Math.random() * 100}%`;
+                flake.style.top = `-${Math.random() * 20}px`;
+                flake.style.animationDuration = `${Math.random() * 3 + 3}s`;
+                flake.style.animationDelay = `${Math.random() * 4}s`;
+                container.appendChild(flake);
+            }
+        }
+
+        /* ==========================================================================
+           5. ระบบถาดเครื่องมือ & การวางของตกแต่ง (Drag & Drop + Tap to Place)
+           ========================================================================== */
+        function switchCategory(cat) {
+            currentCategory = cat;
+            selectedTrayItem = null;
+
+            // อัปเดตสีปุ่ม Tab
+            ['tree', 'fireplace', 'lights'].forEach(c => {
+                const btn = document.getElementById(`tab-${c}`);
+                if (c === cat) {
+                    btn.className = 'scrapbook-btn bg-[#81b29a] text-white px-3 py-1.5 text-xs sm:text-sm font-bold flex items-center gap-1.5 shrink-0';
+                } else {
+                    btn.className = 'scrapbook-btn bg-[#f4f1de] text-[#4a3f35] px-3 py-1.5 text-xs sm:text-sm font-bold flex items-center gap-1.5 shrink-0';
+                }
+            });
+
+            renderTrayItems(cat);
+        }
+
+        function renderTrayItems(cat) {
+            const container = document.getElementById('tray-items-container');
+            container.innerHTML = '';
+
+            DECORATION_CATALOG[cat].forEach(item => {
+                const card = document.createElement('div');
+                const isSelected = selectedTrayItem && selectedTrayItem.id === item.id;
+                card.className = `tray-item-card shrink-0 w-20 sm:w-24 h-20 sm:h-22 rounded-2xl border-2 ${isSelected ? 'border-[#e07a5f] bg-[#fff3b0] scale-105' : 'border-[#5c4d3c] bg-[#fdf6ec] hover:bg-[#f4e4d7]'} flex flex-col items-center justify-center p-1.5 cursor-grab active:cursor-grabbing transition shadow-xs`;
+                
+                card.innerHTML = `
+                    <div class="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center pointer-events-none">${item.svg}</div>
+                    <span class="text-[10px] sm:text-[11px] font-semibold text-center text-[#4a3f35] leading-tight mt-1 line-clamp-1 pointer-events-none">${item.name}</span>
+                `;
+
+                // จับลากจากถาดไปวาง (รองรับทั้งเมาส์และหน้าจอสัมผัสอย่างลื่นไหล)
+                card.addEventListener('pointerdown', (e) => {
+                    if (roomPhase === 'sleeping') return;
+                    if (e.button !== undefined && e.button !== 0) return;
+                    startDragFromTray(e, item, card);
+                });
+
+                container.appendChild(card);
+            });
+        }
+
+        // ลากจากถาดไปวางบนฉาก (รองรับทั้งการลากปล่อย และ การแตะเลือกแล้วจิ้มวาง)
+        function startDragFromTray(e, item, cardElement) {
+            const ghost = document.getElementById('drag-ghost');
+            const stage = document.getElementById('living-room-stage');
+            let isDragging = false;
+            const startX = e.clientX;
+            const startY = e.clientY;
+            const pointerId = e.pointerId;
+
+            if (cardElement.setPointerCapture) {
+                try { cardElement.setPointerCapture(pointerId); } catch (err) {}
+            }
+
+            const onPointerMove = (moveEvent) => {
+                if (moveEvent.pointerId !== pointerId) return;
+                const dx = moveEvent.clientX - startX;
+                const dy = moveEvent.clientY - startY;
+
+                if (!isDragging && Math.hypot(dx, dy) > 6) {
+                    isDragging = true;
+                    deselectItem();
+                    ghost.innerHTML = item.svg;
+                    ghost.style.width = `${item.size}px`;
+                    ghost.style.height = `${item.size}px`;
+                    ghost.classList.remove('hidden');
+                    stage.classList.add('drop-target-active');
+                    updateStatus(`กำลังลาก "${item.name}" — ปล่อยนิ้ว/เมาส์เพื่อวางบนฉากได้เลย!`, '🖐️');
+                }
+
+                if (isDragging) {
+                    moveEvent.preventDefault();
+                    ghost.style.left = `${moveEvent.clientX}px`;
+                    ghost.style.top = `${moveEvent.clientY}px`;
+                }
+            };
+
+            const cleanup = () => {
+                window.removeEventListener('pointermove', onPointerMove);
+                window.removeEventListener('pointerup', onPointerUp);
+                window.removeEventListener('pointercancel', onPointerUp);
+                ghost.classList.add('hidden');
+                stage.classList.remove('drop-target-active');
+                if (cardElement.releasePointerCapture) {
+                    try { cardElement.releasePointerCapture(pointerId); } catch (err) {}
+                }
+            };
+
+            const onPointerUp = (upEvent) => {
+                if (upEvent.pointerId !== pointerId) return;
+                cleanup();
+
+                if (isDragging) {
+                    const rect = stage.getBoundingClientRect();
+                    if (
+                        upEvent.clientX >= rect.left &&
+                        upEvent.clientX <= rect.right &&
+                        upEvent.clientY >= rect.top &&
+                        upEvent.clientY <= rect.bottom
+                    ) {
+                        const xPercent = ((upEvent.clientX - rect.left) / rect.width) * 100;
+                        const yPercent = ((upEvent.clientY - rect.top) / rect.height) * 100;
+                        placeDecorationAt(item, xPercent, yPercent);
+                        selectedTrayItem = null;
+                        renderTrayItems(currentCategory);
+                    } else {
+                        updateStatus('ลากของตกแต่งไปวางบนต้นไม้หรือเตาผิงได้เลย!', '🖐️');
+                    }
+                } else {
+                    // กรณีแตะสั้นๆ โดยไม่ได้ลาก ให้สลับสถานะเลือกไอเทมไว้จิ้มวางบนฉาก
+                    if (selectedTrayItem && selectedTrayItem.id === item.id) {
+                        selectedTrayItem = null;
+                        updateStatus('ยกเลิกการเลือกไอเทมแล้ว', '✨');
+                    } else {
+                        selectedTrayItem = item;
+                        deselectItem();
+                        updateStatus(`เลือก "${item.name}" แล้ว — แตะตรงจุดที่ต้องการวาง หรือลากจากถาดไปวางก็ได้!`, '👆');
+                    }
+                    renderTrayItems(currentCategory);
+                }
+            };
+
+            window.addEventListener('pointermove', onPointerMove, { passive: false });
+            window.addEventListener('pointerup', onPointerUp);
+            window.addEventListener('pointercancel', onPointerUp);
+        }
+
+        // ตั้งค่าการคลิกวางบนฉาก
+        function setupStageInteractions() {
+            const stage = document.getElementById('living-room-stage');
+            stage.addEventListener('click', (e) => {
+                if (roomPhase === 'sleeping') return;
+                // ถ้าคลิกโดนของตกแต่งหรือปุ่มต่างๆ ไม่ต้องวางซ้อน
+                if (e.target.closest('.placed-item') || e.target.closest('button') || e.target.closest('.gift-box-item')) {
+                    return;
+                }
+
+                if (selectedTrayItem) {
+                    const rect = stage.getBoundingClientRect();
+                    const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
+                    const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
+                    placeDecorationAt(selectedTrayItem, xPercent, yPercent);
+                } else {
+                    deselectItem();
+                }
+            });
+        }
+
+        function placeDecorationAt(item, xPercent, yPercent) {
+            // จำกัดขอบเขตให้อยู่ในฉากสวยงาม
+            const clampedX = Math.max(4, Math.min(96, xPercent));
+            const clampedY = Math.max(6, Math.min(92, yPercent));
+
+            const newDec = {
+                uid: 'dec_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                catalogId: item.id,
+                name: item.name,
+                svg: item.svg,
+                size: item.size,
+                xPercent: clampedX,
+                yPercent: clampedY,
+                scale: 1,
+                rotation: 0
+            };
+
+            placedDecorations.push(newDec);
+            renderPlacedDecorations();
+            selectPlacedItem(newDec.uid);
+            updateCozyMeter();
+            playPopSound(660);
+            updateStatus(`วาง "${item.name}" เรียบร้อย! สามารถลากย้ายหรือปรับขนาดได้นะ`, '🎄');
+        }
+
+        /* ==========================================================================
+           6. การแสดงผลและลากย้ายของตกแต่งที่วางบนฉากแล้ว
+           ========================================================================== */
+        function positionFloatingToolbar(dec) {
+            const toolbar = document.getElementById('item-toolbar');
+            if (!dec || !toolbar) return;
+
+            // วางแถบเครื่องมือเหนือไอเทม (หรือใต้ไอเทมถ้าไอเทมอยู่ชิดขอบบนเกินไป)
+            const clampedLeft = Math.max(22, Math.min(78, dec.xPercent));
+            toolbar.style.left = `${clampedLeft}%`;
+
+            if (dec.yPercent < 20) {
+                toolbar.style.top = `calc(${dec.yPercent}% + ${(dec.size * dec.scale) / 2 + 12}px)`;
+            } else {
+                toolbar.style.top = `calc(${dec.yPercent}% - ${(dec.size * dec.scale) / 2 + 44}px)`;
+            }
+        }
+
+        function renderPlacedDecorations() {
+            const layer = document.getElementById('decorations-layer');
+            layer.innerHTML = '';
+
+            placedDecorations.forEach(dec => {
+                const el = document.createElement('div');
+                const isSelected = selectedPlacementId === dec.uid;
+                el.className = `placed-item ${isSelected ? 'selected' : ''}`;
+                el.style.left = `${dec.xPercent}%`;
+                el.style.top = `${dec.yPercent}%`;
+                el.style.width = `${dec.size}px`;
+                el.style.height = `${dec.size}px`;
+                el.style.transform = `translate(-50%, -50%) scale(${dec.scale}) rotate(${dec.rotation}deg)`;
+                el.innerHTML = dec.svg;
+
+                if (isSelected) {
+                    positionFloatingToolbar(dec);
+                }
+
+                // รองรับการจับลากย้ายตำแหน่งบนฉากได้อย่างอิสระ (ทั้งเมาส์และสัมผัส)
+                el.addEventListener('pointerdown', (e) => {
+                    if (roomPhase === 'sleeping') return;
+                    if (e.button !== undefined && e.button !== 0) return;
+                    e.stopPropagation();
+                    e.preventDefault();
+
+                    const pointerId = e.pointerId;
+                    if (el.setPointerCapture) {
+                        try { el.setPointerCapture(pointerId); } catch (err) {}
+                    }
+
+                    // เลือกชิ้นนี้ทันทีโดยไม่ Re-render DOM ระหว่างกำลังลาก
+                    if (selectedPlacementId !== dec.uid) {
+                        selectedPlacementId = dec.uid;
+                        selectedTrayItem = null;
+                        renderTrayItems(currentCategory);
+                        document.querySelectorAll('.placed-item').forEach(node => node.classList.remove('selected'));
+                        el.classList.add('selected');
+                    }
+
+                    const toolbar = document.getElementById('item-toolbar');
+                    toolbar.classList.remove('hidden');
+                    positionFloatingToolbar(dec);
+
+                    const stage = document.getElementById('living-room-stage');
+                    const rect = stage.getBoundingClientRect();
+                    const startPointerX = e.clientX;
+                    const startPointerY = e.clientY;
+                    const origX = dec.xPercent;
+                    const origY = dec.yPercent;
+                    let moved = false;
+
+                    const onMove = (moveEvt) => {
+                        if (moveEvt.pointerId !== pointerId) return;
+                        moveEvt.preventDefault();
+
+                        const dxPercent = ((moveEvt.clientX - startPointerX) / rect.width) * 100;
+                        const dyPercent = ((moveEvt.clientY - startPointerY) / rect.height) * 100;
+
+                        if (!moved && Math.hypot(moveEvt.clientX - startPointerX, moveEvt.clientY - startPointerY) > 3) {
+                            moved = true;
+                            el.classList.add('dragging');
+                            toolbar.classList.add('opacity-30', 'pointer-events-none');
+                        }
+
+                        dec.xPercent = Math.max(4, Math.min(96, origX + dxPercent));
+                        dec.yPercent = Math.max(6, Math.min(92, origY + dyPercent));
+                        el.style.left = `${dec.xPercent}%`;
+                        el.style.top = `${dec.yPercent}%`;
+                        positionFloatingToolbar(dec);
+                    };
+
+                    const onUp = (upEvt) => {
+                        if (upEvt.pointerId !== pointerId) return;
+                        window.removeEventListener('pointermove', onMove);
+                        window.removeEventListener('pointerup', onUp);
+                        window.removeEventListener('pointercancel', onUp);
+                        el.classList.remove('dragging');
+                        toolbar.classList.remove('opacity-30', 'pointer-events-none');
+                        positionFloatingToolbar(dec);
+
+                        if (el.releasePointerCapture) {
+                            try { el.releasePointerCapture(pointerId); } catch (err) {}
+                        }
+                        if (moved) {
+                            playPopSound(600);
+                            updateStatus(`ย้ายตำแหน่ง "${dec.name}" เรียบร้อย!`, '✨');
+                        }
+                    };
+
+                    window.addEventListener('pointermove', onMove, { passive: false });
+                    window.addEventListener('pointerup', onUp);
+                    window.addEventListener('pointercancel', onUp);
+                });
+
+                layer.appendChild(el);
+            });
+        }
+
+        function selectPlacedItem(uid) {
+            selectedPlacementId = uid;
+            selectedTrayItem = null;
+            renderTrayItems(currentCategory);
+            renderPlacedDecorations();
+            const dec = placedDecorations.find(d => d.uid === uid);
+            const toolbar = document.getElementById('item-toolbar');
+            toolbar.classList.remove('hidden');
+            positionFloatingToolbar(dec);
+        }
+
+        function deselectItem() {
+            selectedPlacementId = null;
+            document.getElementById('item-toolbar').classList.add('hidden');
+            renderPlacedDecorations();
+        }
+
+        function scaleSelectedItem(delta) {
+            const item = placedDecorations.find(d => d.uid === selectedPlacementId);
+            if (!item) return;
+            item.scale = Math.max(0.6, Math.min(1.8, +(item.scale + delta).toFixed(2)));
+            playPopSound(550);
+            renderPlacedDecorations();
+        }
+
+        function rotateSelectedItem(angleDelta = 15) {
+            const item = placedDecorations.find(d => d.uid === selectedPlacementId);
+            if (!item) return;
+            item.rotation = (item.rotation + angleDelta + 360) % 360;
+            playPopSound(580);
+            renderPlacedDecorations();
+        }
+
+        function deleteSelectedItem() {
+            if (!selectedPlacementId) return;
+            placedDecorations = placedDecorations.filter(d => d.uid !== selectedPlacementId);
+            deselectItem();
+            updateCozyMeter();
+            playPopSound(340);
+            updateStatus('เก็บของตกแต่งชิ้นนั้นเรียบร้อยแล้ว', '🗑️');
+        }
+
+        function confirmClearDecorations() {
+            if (placedDecorations.length === 0) {
+                updateStatus('ยังไม่มีของตกแต่งให้เก็บเลย ลองวางของตกแต่งดูก่อนนะ!', '✨');
+                return;
+            }
+            document.getElementById('confirm-clear-modal').classList.remove('hidden');
+        }
+
+        function closeConfirmClearModal() {
+            document.getElementById('confirm-clear-modal').classList.add('hidden');
+        }
+
+        function clearAllDecorations() {
+            placedDecorations = [];
+            deselectItem();
+            renderPlacedDecorations();
+            updateCozyMeter();
+            closeConfirmClearModal();
+            playPopSound(320);
+            updateStatus('เก็บของตกแต่งทั้งหมดเรียบร้อย เริ่มตกแต่งใหม่ได้เลย!', '🧹');
+        }
+
+        /* คำนวณคะแนนความอบอุ่นของห้อง (มีผลต่อจำนวนกล่องของขวัญจากซานต้า) */
+        function calculateCozyScore() {
+            let score = 15 + placedDecorations.length * 7;
+            // โบนัสถ้ามีดาวติดยอดไม้หรือถุงเท้า
+            const hasStar = placedDecorations.some(d => d.catalogId === 'star_topper');
+            const hasStocking = placedDecorations.some(d => d.catalogId.startsWith('stocking'));
+            if (hasStar) score += 10;
+            if (hasStocking) score += 10;
+            return Math.min(100, score);
+        }
+
+        function updateCozyMeter() {
+            const score = calculateCozyScore();
+            document.getElementById('cozy-meter-bar').style.width = `${score}%`;
+            document.getElementById('cozy-score-text').textContent = `${score}%`;
+        }
+
+        function updateStatus(msg, emoji = '✨') {
+            document.getElementById('status-message').textContent = msg;
+            document.getElementById('status-emoji').textContent = emoji;
+        }
+
+        /* ==========================================================================
+           7. ระบบเข้านอน & ตื่นนอนเช้าวันคริสต์มาส (Sleep & Wake Up Cycle)
+           ========================================================================== */
+        function handleSleepCycle() {
+            if (roomPhase === 'decorating' || roomPhase === 'morning') {
+                startSleepingPhase();
+            } else if (roomPhase === 'sleeping') {
+                wakeUpMorning();
+            }
+        }
+
+        function startSleepingPhase() {
+            roomPhase = 'sleeping';
+            deselectItem();
+            selectedTrayItem = null;
+            renderTrayItems(currentCategory);
+
+            // เคลียร์กล่องของขวัญรอบเก่า (ถ้ามี)
+            document.getElementById('gifts-under-tree-layer').innerHTML = '';
+            document.getElementById('morning-sunbeam').style.opacity = '0';
+
+            // เปลี่ยนท้องฟ้าหน้าต่างเป็นกลางคืนมืดสนิทและเปิดซานต้าขี่เลื่อน
+            document.getElementById('window-sky').className = 'absolute inset-0 bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#334155] transition-colors duration-1000';
+            document.getElementById('santa-window-fly').classList.remove('hidden');
+
+            // แสดง Overlay เข้านอน
+            const overlay = document.getElementById('night-sleep-overlay');
+            const progressBar = document.getElementById('sleep-progress-bar');
+            const progressWrap = document.getElementById('sleep-progress-wrap');
+            const wakeBtn = document.getElementById('btn-wake-up');
+            const sleepTitle = document.getElementById('sleep-title');
+            const sleepSub = document.getElementById('sleep-subtitle');
+
+            overlay.classList.remove('hidden');
+            wakeBtn.classList.add('hidden');
+            progressWrap.classList.remove('hidden');
+            progressBar.style.width = '0%';
+            sleepTitle.textContent = 'กำลังหลับฝันดีในคืนคริสต์มาสอีฟ...';
+            sleepSub.innerHTML = 'ซานตาคลอสกำลังแอบย่องลงมาจากปล่องไฟ<br>เพื่อวางของขวัญสุดพิเศษไว้ใต้ต้นคริสต์มาสของคุณ 🎅✨';
+
+            // ปิดปุ่มเข้านอนด้านบนชั่วคราว
+            const topBtn = document.getElementById('btn-sleep-cycle');
+            topBtn.disabled = true;
+            topBtn.classList.add('opacity-50');
+
+            updateStatus('🌙 กำลังหลับฝันดี... รอซานตาคลอสมาส่งของขวัญสักครู่นะ', '🌙');
+            playLullabyNotes();
+
+            // จำลองเวลาซานต้ามาส่งของขวัญ (ประมาณ 3.8 วินาที)
+            let progress = 0;
+            const timer = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = `${progress}%`;
+
+                if (progress === 50) {
+                    sleepTitle.textContent = 'โฮ่ โฮ่ โฮ่! ซานต้ามาถึงแล้ว 🎅';
+                    sleepSub.innerHTML = 'ซานต้าประทับใจการตกแต่งห้องของคุณมาก<br>กำลังวางกล่องของขวัญไว้ใต้ต้นคริสต์มาส...';
+                }
+
+                if (progress >= 100) {
+                    clearInterval(timer);
+                    progressWrap.classList.add('hidden');
+                    sleepTitle.textContent = 'เช้าวันคริสต์มาสมาถึงแล้ว! 🔔';
+                    sleepSub.innerHTML = 'ซานตาคลอสวางของขวัญไว้ใต้ต้นคริสต์มาสเรียบร้อยแล้ว<br>รีบตื่นไปดูกันเลยว่าได้อะไรบ้าง!';
+                    wakeBtn.classList.remove('hidden');
+                    
+                    topBtn.disabled = false;
+                    topBtn.classList.remove('opacity-50');
+                    document.getElementById('sleep-btn-icon').textContent = '☀️';
+                    document.getElementById('sleep-btn-text').textContent = 'ตื่นนอนรับของขวัญ';
+                    playChimeChord();
+                }
+            }, 180);
+        }
+
+        function wakeUpMorning() {
+            roomPhase = 'morning';
+
+            // ซ่อนหน้าต่างกลางคืน
+            document.getElementById('night-sleep-overlay').classList.add('hidden');
+            document.getElementById('santa-window-fly').classList.add('hidden');
+
+            // ปรับท้องฟ้าเป็นเช้าวันคริสต์มาสสดใส & มีแสงแดดอ่อนๆ
+            document.getElementById('window-sky').className = 'absolute inset-0 bg-gradient-to-b from-[#7bdff2] via-[#b2f7ef] to-[#eff7f6] transition-colors duration-1000';
+            document.getElementById('morning-sunbeam').style.opacity = '1';
+
+            // อัปเดตปุ่มด้านบนให้สามารถเข้านอนในคืนถัดไปได้อีก
+            document.getElementById('sleep-btn-icon').textContent = '🌙';
+            document.getElementById('sleep-btn-text').textContent = 'เข้านอนคืนถัดไป';
+
+            // เสกกล่องของขวัญใต้ต้นคริสต์มาสตามคะแนนความอบอุ่น!
+            spawnPresentsUnderTree();
+            playChimeChord();
+            updateStatus('☀️ สุขสันต์วันคริสต์มาส! คลิกที่กล่องของขวัญใต้ต้นคริสต์มาสเพื่อแกะกล่องเลย 🎁', '🎉');
+        }
+
+        /* ==========================================================================
+           8. ระบบสร้างกล่องของขวัญใต้ต้นไม้ & การแกะกล่อง (Gift Unboxing)
+           ========================================================================== */
+        function spawnPresentsUnderTree() {
+            const score = calculateCozyScore();
+            // ยิ่งตกแต่งเยอะ ยิ่งได้กล่องของขวัญเยอะ (อย่างน้อย 2 กล่อง สูงสุด 5 กล่อง)
+            let giftCount = 2;
+            if (score >= 30) giftCount = 3;
+            if (score >= 60) giftCount = 4;
+            if (score >= 85) giftCount = 5;
+
+            const boxThemes = [
+                { box: '#e07a5f', ribbon: '#f2cc8f', size: 54 },
+                { box: '#81b29a', ribbon: '#fffcf7', size: 60 },
+                { box: '#f2cc8f', ribbon: '#e07a5f', size: 50 },
+                { box: '#f4978e', ribbon: '#81b29a', size: 56 },
+                { box: '#a0c4ff', ribbon: '#ffd166', size: 52 }
+            ];
+
+            // สุ่มของขวัญไม่ซ้ำกันในรอบนี้
+            const shuffledPool = [...CHRISTMAS_PRESENTS_POOL].sort(() => Math.random() - 0.5);
+            spawnedGifts = [];
+
+            for (let i = 0; i < giftCount; i++) {
+                const present = shuffledPool[i % shuffledPool.length];
+                const theme = boxThemes[i % boxThemes.length];
+                spawnedGifts.push({
+                    index: i,
+                    present: present,
+                    theme: theme,
+                    opened: false
+                });
+            }
+
+            renderGiftsUnderTree();
+        }
+
+        function renderGiftsUnderTree() {
+            const container = document.getElementById('gifts-under-tree-layer');
+            container.innerHTML = '';
+
+            spawnedGifts.forEach((g, idx) => {
+                if (g.opened) return; // กล่องที่แกะแล้วจะหายไปจากใต้ต้นไม้
+
+                const btn = document.createElement('div');
+                btn.className = 'gift-box-item pointer-events-auto relative flex flex-col items-center';
+                btn.style.width = `${g.theme.size}px`;
+                btn.style.height = `${g.theme.size}px`;
+                btn.style.animationDelay = `${idx * 0.25}s`;
+                btn.title = 'คลิกเพื่อแกะกล่องของขวัญ!';
+
+                btn.innerHTML = `
+                    <svg viewBox="0 0 60 60" class="w-full h-full drop-shadow-md">
+                        <!-- ตัวกล่อง -->
+                        <rect x="8" y="20" width="44" height="34" rx="5" fill="${g.theme.box}" stroke="#5c4d3c" stroke-width="2.8"/>
+                        <!-- ริบบิ้นแนวตั้ง -->
+                        <rect x="26" y="20" width="8" height="34" fill="${g.theme.ribbon}" stroke="#5c4d3c" stroke-width="2"/>
+                        <!-- ฝากล่อง -->
+                        <rect x="5" y="13" width="50" height="9" rx="3" fill="${g.theme.box}" stroke="#5c4d3c" stroke-width="2.8"/>
+                        <rect x="26" y="13" width="8" height="9" fill="${g.theme.ribbon}" stroke="#5c4d3c" stroke-width="2"/>
+                        <!-- โบว์ด้านบน -->
+                        <path d="M30,13 C22,3 14,7 20,13 Z" fill="${g.theme.ribbon}" stroke="#5c4d3c" stroke-width="2.2"/>
+                        <path d="M30,13 C38,3 46,7 40,13 Z" fill="${g.theme.ribbon}" stroke="#5c4d3c" stroke-width="2.2"/>
+                    </svg>
+                    <span class="absolute -top-3 bg-[#fffcf7] border border-[#5c4d3c] text-[9px] font-bold px-1.5 rounded-full shadow-xs">แกะเลย!</span>
+                `;
+
+                btn.addEventListener('click', () => {
+                    btn.classList.add('gift-shaking');
+                    playPopSound(750);
+                    setTimeout(() => {
+                        openGiftBox(idx);
+                    }, 520);
+                });
+
+                container.appendChild(btn);
+            });
+        }
+
+        function openGiftBox(idx) {
+            const giftObj = spawnedGifts[idx];
+            if (!giftObj) return;
+
+            giftObj.opened = true;
+            renderGiftsUnderTree();
+
+            const item = giftObj.present;
+            // บันทึกลงสมุดสะสม
+            if (!collectedGiftIds.includes(item.id)) {
+                collectedGiftIds.push(item.id);
+                saveCollectionToStorage();
+                updateCollectionBadge();
+            }
+
+            // แสดงข้อมูลใน Modal แกะกล่อง
+            document.getElementById('unbox-item-visual').textContent = item.emoji;
+            document.getElementById('unbox-item-name').textContent = item.name;
+            document.getElementById('unbox-item-rarity').textContent = `ระดับ: ${item.rarity}`;
+            document.getElementById('unbox-item-blessing').textContent = `"${item.blessing}"`;
+
+            document.getElementById('unbox-modal').classList.remove('hidden');
+            triggerModalConfetti();
+            playChimeChord();
+
+            // เช็คว่าแกะครบทุกกล่องหรือยัง
+            const remaining = spawnedGifts.filter(g => !g.opened).length;
+            if (remaining === 0) {
+                updateStatus('🎁 แกะของขวัญครบทุกกล่องแล้ว! ดูในสมุดสะสม หรือเข้านอนคืนถัดไปได้นะ', '💖');
+            } else {
+                updateStatus(`ว้าว! ได้รับ "${item.name}" ยังเหลือของขวัญอีก ${remaining} กล่องให้แกะนะ!`, '🎁');
+            }
+        }
+
+        function closeUnboxModal() {
+            document.getElementById('unbox-modal').classList.add('hidden');
+        }
+
+        function triggerModalConfetti() {
+            const container = document.getElementById('confetti-container');
+            container.innerHTML = '';
+            const colors = ['#e07a5f', '#81b29a', '#f2cc8f', '#f4978e', '#9bf6ff'];
+            for (let i = 0; i < 30; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'absolute rounded-xs';
+                piece.style.width = `${Math.random() * 8 + 5}px`;
+                piece.style.height = `${Math.random() * 8 + 5}px`;
+                piece.style.backgroundColor = colors[i % colors.length];
+                piece.style.left = `${Math.random() * 100}%`;
+                piece.style.top = `-10px`;
+                piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+                piece.style.transition = `all ${Math.random() * 1 + 1.2}s ease-out`;
+                container.appendChild(piece);
+
+                requestAnimationFrame(() => {
+                    piece.style.top = `${Math.random() * 80 + 20}%`;
+                    piece.style.opacity = '0';
+                });
+            }
+        }
+
+        /* ==========================================================================
+           9. สมุดสะสมของขวัญ (Collection Scrapbook)
+           ========================================================================== */
+        function loadCollectionFromStorage() {
+            try {
+                const saved = localStorage.getItem('cozy_xmas_gifts_v1');
+                if (saved) {
+                    collectedGiftIds = JSON.parse(saved);
+                }
+            } catch (e) {
+                collectedGiftIds = [];
+            }
+            updateCollectionBadge();
+        }
+
+        function saveCollectionToStorage() {
+            try {
+                localStorage.setItem('cozy_xmas_gifts_v1', JSON.stringify(collectedGiftIds));
+            } catch (e) {}
+        }
+
+        function updateCollectionBadge() {
+            document.getElementById('collection-badge').textContent = collectedGiftIds.length;
+        }
+
+        function openCollectionModal() {
+            const grid = document.getElementById('collection-grid');
+            grid.innerHTML = '';
+
+            CHRISTMAS_PRESENTS_POOL.forEach(item => {
+                const isUnlocked = collectedGiftIds.includes(item.id);
+                const card = document.createElement('div');
+                card.className = `rounded-2xl border-2 p-3 flex flex-col items-center text-center transition ${
+                    isUnlocked 
+                    ? 'border-[#5c4d3c] bg-[#fdf6ec] shadow-xs' 
+                    : 'border-dashed border-[#cbbba8] bg-[#f5ebe0]/50 opacity-60'
+                }`;
+
+                card.innerHTML = `
+                    <div class="text-4xl mb-1.5">${isUnlocked ? item.emoji : '❓'}</div>
+                    <div class="text-xs font-bold text-[#4a3f35] line-clamp-1">${isUnlocked ? item.name : 'ของขวัญปริศนา'}</div>
+                    <div class="text-[10px] text-[#7f6d5c] mt-0.5">${isUnlocked ? item.rarity : 'เข้านอนรอซานต้าเพื่อปลดล็อก'}</div>
+                `;
+
+                if (isUnlocked) {
+                    card.classList.add('cursor-pointer', 'hover:scale-103');
+                    card.addEventListener('click', () => {
+                        closeCollectionModal();
+                        document.getElementById('unbox-item-visual').textContent = item.emoji;
+                        document.getElementById('unbox-item-name').textContent = item.name;
+                        document.getElementById('unbox-item-rarity').textContent = `ระดับ: ${item.rarity}`;
+                        document.getElementById('unbox-item-blessing').textContent = `"${item.blessing}"`;
+                        document.getElementById('unbox-modal').classList.remove('hidden');
+                    });
+                }
+
+                grid.appendChild(card);
+            });
+
+            document.getElementById('collection-count-text').textContent = `สะสมได้แล้ว ${collectedGiftIds.length} / ${CHRISTMAS_PRESENTS_POOL.length} ชิ้น`;
+            document.getElementById('collection-modal').classList.remove('hidden');
+        }
+
+        function closeCollectionModal() {
+            document.getElementById('collection-modal').classList.add('hidden');
+        }
+
+        /* ==========================================================================
+           10. ระบบเสียงบรรเลงกล่องดนตรี & เสียงฟืนไฟ (Web Audio API - ไม่ใช้ไฟล์ภายนอก)
+           ========================================================================== */
+        function initAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContextClass();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playPopSound(freq = 500) {
+            try {
+                initAudioContext();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(freq * 1.35, audioCtx.currentTime + 0.09);
+
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } catch (e) {}
+        }
+
+        function playChimeChord() {
+            try {
+                initAudioContext();
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.08);
+
+                    gain.gain.setValueAtTime(0.07, audioCtx.currentTime + i * 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.08 + 0.6);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(audioCtx.currentTime + i * 0.08);
+                    osc.stop(audioCtx.currentTime + i * 0.08 + 0.65);
+                });
+            } catch (e) {}
+        }
+
+        function playLullabyNotes() {
+            try {
+                initAudioContext();
+                const notes = [659.25, 587.33, 523.25, 392.00]; // E5, D5, C5, G4
+                notes.forEach((freq, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.25);
+                    gain.gain.setValueAtTime(0.06, audioCtx.currentTime + i * 0.25);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.25 + 0.7);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(audioCtx.currentTime + i * 0.25);
+                    osc.stop(audioCtx.currentTime + i * 0.25 + 0.75);
+                });
+            } catch (e) {}
+        }
+
+        // เพลงกล่องดนตรีวนลูปน่ารักๆ (ทำนอง Jingle Bells / We Wish You a Merry Christmas แบบกล่องดนตรี)
+        function toggleMusic() {
+            initAudioContext();
+            isMusicPlaying = !isMusicPlaying;
+            const icon = document.getElementById('music-icon');
+
+            if (isMusicPlaying) {
+                icon.textContent = '🎵';
+                // โน้ตเพลงทำนองคริสต์มาสสบายๆ (ความถี่ Hz)
+                const melody = [
+                    392, 523.25, 523.25, 587.33, 523.25, 493.88, 440, 440,
+                    440, 587.33, 587.33, 659.25, 587.33, 523.25, 493.88, 392,
+                    392, 659.25, 659.25, 698.46, 659.25, 587.33, 523.25, 440,
+                    392, 392, 440, 587.33, 493.88, 523.25, 0, 0
+                ];
+                let step = 0;
+
+                const playStep = () => {
+                    if (!isMusicPlaying) return;
+                    const freq = melody[step % melody.length];
+                    if (freq > 0) {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(0.055, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.42);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 0.45);
+                    }
+                    step++;
+                };
+
+                playStep();
+                musicInterval = setInterval(playStep, 430);
+                updateStatus('🎵 เปิดเพลงกล่องดนตรีคริสต์มาสแล้ว ฟังสบายๆ เลย', '🎵');
+            } else {
+                icon.textContent = '🔇';
+                clearInterval(musicInterval);
+                updateStatus('ปิดเพลงกล่องดนตรีแล้ว', '🔇');
+            }
+        }
+
+        // เสียงฟืนไฟปะทุเบาๆ ด้วย Brown/Pink Noise
+        function toggleFireSound() {
+            initAudioContext();
+            isFireSoundPlaying = !isFireSoundPlaying;
+            const icon = document.getElementById('fire-sound-icon');
+
+            if (isFireSoundPlaying) {
+                icon.textContent = '🔥';
+                const bufferSize = audioCtx.sampleRate * 2;
+                const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                let lastOut = 0.0;
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    // กรองเป็นเสียงทุ้มนุ่มๆ และใส่เสียงปะทุเล็กน้อย
+                    output[i] = (lastOut + (0.04 * white)) / 1.04;
+                    lastOut = output[i];
+                    if (Math.random() < 0.0015) {
+                        output[i] += (Math.random() * 0.6 - 0.3);
+                    }
+                }
+
+                fireNoiseNode = audioCtx.createBufferSource();
+                fireNoiseNode.buffer = noiseBuffer;
+                fireNoiseNode.loop = true;
+
+                fireGainNode = audioCtx.createGain();
+                fireGainNode.gain.setValueAtTime(0.18, audioCtx.currentTime);
+
+                fireNoiseNode.connect(fireGainNode);
+                fireGainNode.connect(audioCtx.destination);
+                fireNoiseNode.start();
+                updateStatus('🔥 เปิดเสียงฟืนไฟปะทุอุ่นๆ แล้ว', '🔥');
+            } else {
+                icon.textContent = '🪵';
+                if (fireNoiseNode) {
+                    try { fireNoiseNode.stop(); } catch (e) {}
+                    fireNoiseNode = null;
+                }
+                updateStatus('ปิดเสียงฟืนไฟแล้ว', '🪵');
+            }
+        }
+    </script>
+</body>
+</html>
